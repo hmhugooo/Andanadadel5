@@ -340,49 +340,30 @@
     caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{}); 
   } 
 
-  function parseTokens() { 
-    const hash = (window.location.hash || '').replace(/^#/, ''); 
-    const search = (window.location.search || '').replace(/^\?/, ''); 
-    const params = new URLSearchParams(search); 
+  // 1) Detección temprana de tokens para redirigir al Admin 
+  const hash = (window.location.hash || '').replace(/^#/, ''); 
+  const search = (window.location.search || '').replace(/^\?/, ''); 
+  const params = new URLSearchParams(search); 
+  const hashParams = new URLSearchParams(hash); 
 
-    // Tokens “clásicos” en hash 
-    const hashParams = new URLSearchParams(hash); 
-    const inviteHash = hashParams.get('invite_token'); 
-    const recoveryHash = hashParams.get('recovery_token'); 
+  const inviteToken = hashParams.get('invite_token') || (params.get('type') === 'invite' ? params.get('token') : null); 
+  const recoveryToken = hashParams.get('recovery_token') || (params.get('type') === 'recovery' ? params.get('token') : null); 
 
-    // Tokens cuando vienes de /.netlify/identity/verify?token=...&type=invite|recovery 
-    const token = params.get('token'); 
-    const type = params.get('type'); // invite | recovery 
-
-    return { 
-      invite_token: inviteHash || (type === 'invite' ? token : null), 
-      recovery_token: recoveryHash || (type === 'recovery' ? token : null), 
-      rawHash: hash 
-    }; 
+  // Si detectamos invitación o recuperación, redirigimos a /admin/ INMEDIATAMENTE 
+  // Allí el CMS gestionará la apertura del modal y el proceso completo. 
+  if (inviteToken || recoveryToken) { 
+    // Conservamos tanto search como hash para no perder datos 
+    window.location.href = '/admin/' + window.location.search + window.location.hash; 
+    return; // Detener ejecución en Home 
   } 
 
-  function openForToken(mode) { 
-    // mode: 'signup' o 'login' 
-    // a veces init tarda: forzamos espera corta 
-    setTimeout(function () { 
-      try { window.netlifyIdentity.open(mode); } catch(e) { window.netlifyIdentity.open(); } 
-    }, 50); 
-  } 
-
-  function boot() { 
-    const t = parseTokens(); 
-    // Si viene invite/recovery, abrimos modal 
-    if (t.invite_token) openForToken('signup'); 
-    if (t.recovery_token) openForToken('login'); 
-
-    // Siempre: al loguear, al /admin/ 
-    window.netlifyIdentity.on('login', function () { 
-      window.location.href = '/admin/'; 
-    }); 
-  } 
-
+  // 2) Si no hay tokens especiales, inicializamos Identity para login normal en Home (opcional) 
   if (!window.netlifyIdentity) return; 
-  window.netlifyIdentity.on('init', function () { boot(); }); 
+
+  window.netlifyIdentity.on('login', function () { 
+    window.location.href = '/admin/'; 
+  }); 
+
   window.netlifyIdentity.init(); 
 })(); 
 </script> 
