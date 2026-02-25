@@ -331,5 +331,30 @@ if ('serviceWorker' in navigator) {
   if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))); 
 } 
 </script> 
+
+<!-- Netlify Identity Widget (necesario también en la HOME para aceptar invitaciones y resets) --> 
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script> 
+
+<script> 
+  (function () { 
+    if (!window.netlifyIdentity) return; 
+
+    // Si vienes desde un email de invitación o reset, el token llega en el hash (#...) 
+    var hash = window.location.hash || ""; 
+    var hasToken = hash.includes("invite_token=") || hash.includes("recovery_token="); 
+
+    window.netlifyIdentity.init(); 
+
+    if (hasToken) { 
+      // Abre el modal para completar invitación / cambiar contraseña 
+      window.netlifyIdentity.open(); 
+    } 
+
+    // Si inicia sesión, llevar al CMS 
+    window.netlifyIdentity.on("login", function () { 
+      document.location.href = "/admin/"; 
+    }); 
+  })(); 
+</script> 
 </body>
 </html>
