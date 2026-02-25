@@ -25,7 +25,11 @@
       text-transform: uppercase; 
       z-index: 10;
       pointer-events: none;
+      transition: opacity 0.5s ease;
     } 
+    body.cms-ready .loader {
+      opacity: 0;
+    }
   </style> 
 </head> 
 <body> 
@@ -165,6 +169,33 @@
       });
       CMS.registerPreviewTemplate('agenda-file', AgendaPreview);
     }
+  </script>
+
+  <!-- Auto-hide loader script -->
+  <script>
+    (function() {
+      const ncRoot = document.getElementById('nc-root');
+      if (ncRoot) {
+        // Función para ocultar loader
+        const hideLoader = () => {
+          document.body.classList.add('cms-ready');
+        };
+
+        // Si ya tiene contenido (race condition), ocultar
+        if (ncRoot.childNodes.length > 0) {
+          hideLoader();
+        } else {
+          // Si no, observar cambios
+          const observer = new MutationObserver((mutations) => {
+            if (ncRoot.childNodes.length > 0) {
+              hideLoader();
+              observer.disconnect();
+            }
+          });
+          observer.observe(ncRoot, { childList: true });
+        }
+      }
+    })();
   </script>
 
 </body> 
