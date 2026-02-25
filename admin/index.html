@@ -1,165 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Andanada del 5 · CMS</title>
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/png" href="../media/img/faviconandanada.png">
+  
+  <!-- Identity Widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  
   <style>
-    html, body { height: 100%; }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(1200px 600px at 20% 10%, #1a1a1a, #0b0b0b 60%, #000 100%);
       color: #fff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    .cms-shell {
-      display: grid;
-      place-items: center;
-      height: 100%;
+    #nc-root {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .cms-loading {
-      opacity: 0.8;
+    .loading-text {
       font-size: 14px;
       letter-spacing: .08em;
       text-transform: uppercase;
-    }
-    .cms-brand {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.12);
-      z-index: 9999;
-      pointer-events: none;
-    }
-    .cms-brand img {
-      height: 22px;
-      width: 22px;
-      border-radius: 4px;
-    }
-    .cms-brand b {
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      font-size: 12px;
-    }
-    .cms-brand .cms-action {
-      margin-left: 8px;
-      pointer-events: auto;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-    .import-modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.55);
-      z-index: 10000;
-    }
-    .import-modal.is-open { display: flex; }
-    .import-card {
-      width: min(920px, 92vw);
-      max-height: 88vh;
-      overflow: auto;
-      background: #111;
-      color: #fff;
-      border: 1px solid #2a2a2a;
-      border-radius: 12px;
-      box-shadow: 0 40px 120px rgba(0,0,0,0.6);
-      padding: 16px;
-    }
-    .import-title {
-      margin: 0 0 10px;
-      font-size: 16px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-    .import-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .import-textarea {
-      width: 100%;
-      min-height: 240px;
-      border: 1px solid #2a2a2a;
-      border-radius: 10px;
-      background: #0a0a0a;
-      color: #fff;
-      padding: 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      font-size: 12px;
-      resize: vertical;
-    }
-    .import-actions {
-      display: flex;
-      gap: 8px;
-      margin: 10px 0;
-    }
-    .btn {
-      background: #1c1c1c;
-      color: #fff;
-      border: 1px solid #2a2a2a;
-      border-radius: 10px;
-      padding: 8px 12px;
-      cursor: pointer;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      font-size: 12px;
-    }
-    .btn--accent {
-      background: #0052cc;
-      border-color: #0052cc;
-      color: #ffd400;
-    }
-    .import-errors {
-      margin-top: 8px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      font-size: 12px;
-      color: #ffdcdc;
-      background: #1a0f0f;
-      border: 1px solid #522;
-      border-radius: 10px;
-      padding: 8px;
-      white-space: pre-wrap;
+      opacity: 0.8;
     }
   </style>
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </head>
 <body>
-  <div class="cms-shell">
-    <p class="cms-loading">Cargando panel editorial…</p>
+  <div id="nc-root">
+    <p class="loading-text">Cargando panel editorial…</p>
   </div>
-  <div class="cms-brand">
-    <img src="../media/img/logoblanco.png" alt="Andanada del 5">
-    <b>Andanada del 5 · CMS</b>
-  </div>
-  <script>
-    // Iniciar personalizaciones cuando Decap CMS esté disponible
-    document.addEventListener("DOMContentLoaded", function () {
-      if (!window.CMS) return;
 
-      // Estilos del preview: reutilizamos el CSS del sitio para que la vista previa sea 1:1
+  <!-- Decap CMS Script -->
+  <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
+  
+  <!-- Identity Redirect Script -->
+  <script>
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", function(user) {
+        if (!user) {
+          window.netlifyIdentity.on("login", function() {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
+  </script>
+
+  <script>
+    // Custom Previews
+    if (typeof CMS !== 'undefined') {
       CMS.registerPreviewStyle("../assets/css/styles.css");
-      // Pequeños ajustes de la zona de preview
       CMS.registerPreviewStyle(`
         :root {
           --preview-bg: #f6f6f6;
@@ -174,9 +73,6 @@
         }
       `, { raw: true });
 
-      var h = window.h || (window.CMS && window.CMS.h);
-      var createClass = window.createClass || (window.CMS && window.CMS.createClass);
-      if (!(h && createClass)) { return; }
       var PostPreview = createClass({
         render: function () {
           var entry = this.props.entry;
@@ -268,164 +164,7 @@
         }
       });
       CMS.registerPreviewTemplate('agenda-file', AgendaPreview);
-      var importer = document.getElementById('importer');
-      var openBtn = document.getElementById('open-importer');
-      var closeBtn = document.getElementById('close-importer');
-      var parseBtn = document.getElementById('parse-csv');
-      var copyBtn = document.getElementById('copy-json');
-      var combineBtn = document.getElementById('combine-agenda');
-      var replaceDups = document.getElementById('replace-dups');
-      var openAgendaBtn = document.getElementById('open-agenda');
-      var copyOpenAgendaBtn = document.getElementById('copy-open-agenda');
-      var csvInput = document.getElementById('csv-input');
-      var jsonOutput = document.getElementById('json-output');
-      var errorsBox = document.getElementById('import-errors');
-      function openImporter(){ importer.classList.add('is-open'); }
-      function closeImporter(){ importer.classList.remove('is-open'); }
-      if (openBtn) openBtn.addEventListener('click', openImporter);
-      if (closeBtn) closeBtn.addEventListener('click', closeImporter);
-      function slugify(s) {
-        return String(s || '')
-          .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-          .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-      }
-      function normalizeTipo(t) {
-        var s = String(t||'').trim().toLowerCase();
-        if (!s) return '';
-        if (s.indexOf('rejone') !== -1) return 'Corrida de rejones';
-        if (s.indexOf('popular') !== -1) return 'Festejo Popular';
-        if (s.indexOf('sin pic') !== -1 || s === 'nsp') return 'Novillada sin picadores';
-        if (s.indexOf('con pic') !== -1 || s === 'ncp') return 'Novillada con picadores';
-        if (s.indexOf('novillada') !== -1) return 'Novillada con picadores';
-        if (s.indexOf('corrida') !== -1) return 'Corrida de toros';
-        return t;
-      }
-      function validDate(d) {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(d||''))) return false;
-        var x = new Date(d); return !isNaN(x.getTime());
-      }
-      function validTime(h) {
-        if (!h) return true;
-        return /^\d{1,2}:\d{2}$/.test(String(h||''));
-      }
-      function parseCSV(text){
-        var rows = [];
-        var i=0, field='', inQuotes=false, row=[];
-        while(i<=text.length){
-          var c = text[i] || '';
-          if(c === '"' ){
-            if(inQuotes && text[i+1] === '"'){ field+='"'; i++; }
-            else { inQuotes = !inQuotes; }
-          } else if((c === ',' || c === '\n' || c === '\r' || i === text.length) && !inQuotes){
-            row.push(field); field=''; 
-            if(c === '\n' || c === '\r' || i === text.length){ if(row.length) rows.push(row); row=[]; }
-          } else {
-            field += c;
-          }
-          i++;
-        }
-        if(row.length) rows.push(row);
-        return rows.filter(function(r){return r.length && r.join('').trim()!=='';});
-      }
-      if (parseBtn) parseBtn.addEventListener('click', function(){
-        var text = csvInput.value || '';
-        var rows = parseCSV(text);
-        if(!rows.length){ jsonOutput.value = ''; return; }
-        var headers = rows[0].map(function(h){ return h.trim().toLowerCase(); });
-        var dataRows = rows.slice(1);
-        function idx(name){ 
-          var alias = {
-            titulo:['titulo','título','title'],
-            tipo:['tipo','type'],
-            plaza:['plaza'],
-            ciudad:['ciudad','city'],
-            fecha:['fecha','date'],
-            hora:['hora','time'],
-            ganaderia:['ganaderia','ganadería','iron'],
-            buyUrl:['buyurl','entradas','ticket','tickets','url'],
-            poster:['poster','cartel','image']
-          };
-          var list = alias[name] || [name];
-          for(var k=0;k<headers.length;k++){
-            if(list.indexOf(headers[k])!==-1) return k;
-          }
-          return -1;
-        }
-        var I = {
-          tipo: idx('tipo'), titulo: idx('titulo'), plaza: idx('plaza'), ciudad: idx('ciudad'),
-          fecha: idx('fecha'), hora: idx('hora'), ganaderia: idx('ganaderia'), buyUrl: idx('buyUrl'), poster: idx('poster')
-        };
-        var items = [], errs = [];
-        dataRows.forEach(function(r){
-          function v(i){ return i>=0 && r[i] != null ? String(r[i]).trim() : ''; }
-          var ciudad = v(I.ciudad);
-          var fecha = v(I.fecha);
-          var tipo = normalizeTipo(v(I.tipo));
-          var titulo = v(I.titulo);
-          var plaza = v(I.plaza);
-          var hora = v(I.hora);
-          var ganaderia = v(I.ganaderia);
-          var buyUrl = v(I.buyUrl);
-          var poster = v(I.poster);
-          if (!tipo) errs.push('Falta tipo en fila: ' + JSON.stringify(r));
-          if (!fecha || !validDate(fecha)) errs.push('Fecha inválida "'+fecha+'" en fila: ' + JSON.stringify(r));
-          if (hora && !validTime(hora)) errs.push('Hora inválida "'+hora+'" en fila: ' + JSON.stringify(r));
-          var id = [ciudad, fecha, tipo.split(' ')[0] || '', slugify((ganaderia||titulo).split(':')[0]||'')].filter(Boolean).join('-');
-          items.push({
-            id:id, tipo: tipo, titulo: titulo, plaza: plaza, ciudad: ciudad,
-            fecha: fecha, hora: hora, ganaderia: ganaderia, buyUrl: buyUrl, poster: poster
-          });
-        });
-        jsonOutput.value = JSON.stringify({ items: items }, null, 2);
-        if (errs.length) { errorsBox.style.display='block'; errorsBox.textContent = errs.join('\n'); } else { errorsBox.style.display='none'; errorsBox.textContent=''; }
-      });
-      if (copyBtn) copyBtn.addEventListener('click', function(){
-        jsonOutput.select(); document.execCommand('copy');
-      });
-      function openAgendaEditor() {
-        try {
-          // Navegar al editor del archivo Agenda
-          window.location.hash = '#/collections/agenda/entries/agenda-file';
-        } catch(e){}
-      }
-      if (openAgendaBtn) openAgendaBtn.addEventListener('click', openAgendaEditor);
-      if (copyOpenAgendaBtn) copyOpenAgendaBtn.addEventListener('click', function(){
-        jsonOutput.select(); document.execCommand('copy');
-        openAgendaEditor();
-      });
-      async function fetchExistingAgenda(){
-        try {
-          var res = await fetch('../content/agenda/agenda.json', { cache: 'no-cache' });
-          if (!res.ok) throw new Error('No agenda.json');
-          var data = await res.json();
-          if (Array.isArray(data)) return data;
-          if (data && Array.isArray(data.items)) return data.items;
-          if (data && Array.isArray(data.agenda)) return data.agenda;
-          return [];
-        } catch(e){ return []; }
-      }
-      if (combineBtn) combineBtn.addEventListener('click', async function(){
-        var out = jsonOutput.value.trim();
-        if (!out) { errorsBox.style.display='block'; errorsBox.textContent='Primero convierte el CSV a JSON.'; return; }
-        var parsed;
-        try { parsed = JSON.parse(out); } catch(e){ errorsBox.style.display='block'; errorsBox.textContent='JSON inválido: ' + e.message; return; }
-        var newItems = Array.isArray(parsed) ? parsed : (parsed.items||[]);
-        var existing = await fetchExistingAgenda();
-        var byId = {};
-        existing.forEach(function(it){ byId[it.id]=it; });
-        var replace = !!(replaceDups && replaceDups.checked);
-        newItems.forEach(function(n){
-          if (replace || !byId[n.id]) { byId[n.id] = n; }
-        });
-        var combined = Object.keys(byId).map(function(k){ return byId[k]; });
-        combined.sort(function(a,b){ return (a.fecha||'') < (b.fecha||'') ? -1 : ((a.fecha||'') > (b.fecha||'') ? 1 : 0); });
-        jsonOutput.value = JSON.stringify({ items: combined }, null, 2);
-        errorsBox.style.display='block';
-        var replaced = newItems.filter(function(n){ return existing.find(function(e){return e.id===n.id;}); }).length;
-        var added = newItems.length - replaced;
-        errorsBox.textContent = 'Combinado con agenda actual. Añadidos: '+added+' · Duplicados '+(replace?'reemplazados':'omitidos')+': '+replaced+'.';
-      });
-    });
+    }
   </script>
 </body>
 </html>
