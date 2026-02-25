@@ -49,15 +49,37 @@
 
   <!-- Identity Redirect Script -->
   <script> 
-    if (window.netlifyIdentity) { 
-      window.netlifyIdentity.on("init", user => { 
-        if (!user) { 
-          window.netlifyIdentity.on("login", () => { 
-            document.location.href = "/admin/"; 
-          }); 
-        } 
-      }); 
+  (function () { 
+    if (!window.netlifyIdentity) return; 
+
+    function parseTokens() { 
+      const hash = (window.location.hash || '').replace(/^#/, ''); 
+      const search = (window.location.search || '').replace(/^\?/, ''); 
+      const params = new URLSearchParams(search); 
+      const hashParams = new URLSearchParams(hash); 
+
+      const invite = hashParams.get('invite_token'); 
+      const recovery = hashParams.get('recovery_token'); 
+
+      const token = params.get('token'); 
+      const type = params.get('type'); // invite | recovery 
+
+      return { 
+        invite_token: invite || (type === 'invite' ? token : null), 
+        recovery_token: recovery || (type === 'recovery' ? token : null), 
+      }; 
     } 
+
+    function boot() { 
+      const t = parseTokens(); 
+      if (t.invite_token) setTimeout(()=>window.netlifyIdentity.open('signup'), 50); 
+      if (t.recovery_token) setTimeout(()=>window.netlifyIdentity.open('login'), 50); 
+      window.netlifyIdentity.on('login', ()=>{ window.location.href='/admin/'; }); 
+    } 
+
+    window.netlifyIdentity.on('init', boot); 
+    window.netlifyIdentity.init(); 
+  })(); 
   </script> 
 
   <!-- Decap CMS Core -->
