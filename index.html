@@ -325,36 +325,66 @@
 
 <button type="button" class="scroll-top" aria-label="Volver arriba">↑</button>
 <script src="assets/js/main.js" defer></script>
-<script> 
-if ('serviceWorker' in navigator) { 
-  navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())); 
-  if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))); 
-} 
-</script> 
-
 <!-- Netlify Identity Widget (necesario también en la HOME para aceptar invitaciones y resets) --> 
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script> 
 
 <script> 
-  (function () { 
-    if (!window.netlifyIdentity) return; 
+(function () { 
+  // 0) Anti-cache (Chrome): desregistrar SW y limpiar caches 
+  if ('serviceWorker' in navigator) { 
+    navigator.serviceWorker.getRegistrations() 
+      .then(rs => rs.forEach(r => r.unregister())) 
+      .catch(()=>{}); 
+  } 
+  if (window.caches && caches.keys) { 
+    caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{}); 
+  } 
 
-    // Si vienes desde un email de invitación o reset, el token llega en el hash (#...) 
-    var hash = window.location.hash || ""; 
-    var hasToken = hash.includes("invite_token=") || hash.includes("recovery_token="); 
+  function parseTokens() { 
+    const hash = (window.location.hash || '').replace(/^#/, ''); 
+    const search = (window.location.search || '').replace(/^\?/, ''); 
+    const params = new URLSearchParams(search); 
 
-    window.netlifyIdentity.init(); 
+    // Tokens “clásicos” en hash 
+    const hashParams = new URLSearchParams(hash); 
+    const inviteHash = hashParams.get('invite_token'); 
+    const recoveryHash = hashParams.get('recovery_token'); 
 
-    if (hasToken) { 
-      // Abre el modal para completar invitación / cambiar contraseña 
-      window.netlifyIdentity.open(); 
-    } 
+    // Tokens cuando vienes de /.netlify/identity/verify?token=...&type=invite|recovery 
+    const token = params.get('token'); 
+    const type = params.get('type'); // invite | recovery 
 
-    // Si inicia sesión, llevar al CMS 
-    window.netlifyIdentity.on("login", function () { 
-      document.location.href = "/admin/"; 
+    return { 
+      invite_token: inviteHash || (type === 'invite' ? token : null), 
+      recovery_token: recoveryHash || (type === 'recovery' ? token : null), 
+      rawHash: hash 
+    }; 
+  } 
+
+  function openForToken(mode) { 
+    // mode: 'signup' o 'login' 
+    // a veces init tarda: forzamos espera corta 
+    setTimeout(function () { 
+      try { window.netlifyIdentity.open(mode); } catch(e) { window.netlifyIdentity.open(); } 
+    }, 50); 
+  } 
+
+  function boot() { 
+    const t = parseTokens(); 
+    // Si viene invite/recovery, abrimos modal 
+    if (t.invite_token) openForToken('signup'); 
+    if (t.recovery_token) openForToken('login'); 
+
+    // Siempre: al loguear, al /admin/ 
+    window.netlifyIdentity.on('login', function () { 
+      window.location.href = '/admin/'; 
     }); 
-  })(); 
+  } 
+
+  if (!window.netlifyIdentity) return; 
+  window.netlifyIdentity.on('init', function () { boot(); }); 
+  window.netlifyIdentity.init(); 
+})(); 
 </script> 
 </body>
 </html>
