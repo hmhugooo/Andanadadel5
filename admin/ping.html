@@ -1,0 +1,18 @@
+<!doctype html> 
+<html lang="es"> 
+<head> 
+  <meta charset="utf-8"> 
+  <meta name="robots" content="noindex"> 
+  <title>Admin Ping</title> 
+</head> 
+<body style="font-family:system-ui; padding:24px"> 
+  <h1>ADMIN PING OK</h1> 
+  <p>Si ves esto, /admin del repo está en producción.</p> 
+  <pre id="info"></pre> 
+  <script> 
+    document.getElementById('info').textContent = 
+      'URL: ' + location.href + '\n' + 
+      'Build: ' + new Date().toISOString(); 
+  </script> 
+</body> 
+</html>
