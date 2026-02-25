@@ -53,6 +53,14 @@
         }
       });
     }
+
+    // Timeout Check
+    setTimeout(function() {
+      var loadingText = document.querySelector('.loading-text');
+      if (loadingText) {
+        loadingText.innerText = "No se ha podido cargar el CMS. Revisa conexión o configuración.";
+      }
+    }, 10000);
   </script>
 
   <script>
