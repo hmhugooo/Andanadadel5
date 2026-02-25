@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
   <title>Andanada del 5 — CMS</title> 
   <meta name="robots" content="noindex" /> 
-  <script>window.CMS_MANUAL_INIT = true;</script>
   
   <style> 
     body { 
@@ -63,29 +62,6 @@
 
   <!-- Decap CMS Core -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script> 
-
-  <!-- Manual Init Script -->
-  <script> 
-    (function () { 
-      // Asegura el contenedor que Decap necesita 
-      var root = document.getElementById('nc-root'); 
-      if (!root) { 
-        root = document.createElement('div'); 
-        root.id = 'nc-root'; 
-        document.body.appendChild(root); 
-      } 
-  
-      // Inicializa Decap cuando esté disponible 
-      function start() { 
-        if (window.initCMS) { 
-          window.initCMS(); 
-        } else { 
-          setTimeout(start, 50); 
-        } 
-      } 
-      start(); 
-    })(); 
-  </script> 
 
   <!-- Custom Previews -->
   <script>
