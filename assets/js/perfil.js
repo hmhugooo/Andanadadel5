@@ -139,9 +139,15 @@ function initSeasonButtons(id, tipo, perfil) {
             buttons.forEach(function (b) { b.classList.remove("profile-season-btn--active"); });
             btn.classList.add("profile-season-btn--active");
             updateStatsForSeason(id, tipo, season, perfil);
-            var url = new URL(window.location.href);
-            url.searchParams.set("season", season);
-            window.history.replaceState({}, "", url.toString());
+
+            // Avoid overriding identity tokens in hash
+            var h = window.location.hash || "";
+            if (h.indexOf("invite_token=") === -1 && h.indexOf("recovery_token=") === -1 && h.indexOf("confirmation_token=") === -1) {
+                var url = new URL(window.location.href);
+                url.searchParams.set("season", season);
+                window.history.replaceState({}, "", url.toString());
+            }
+
             var back = document.getElementById("profile-back");
             if (back) {
                 back.href = "estadisticas.html?type=" + encodeURIComponent(tipo) + "&season=" + encodeURIComponent(season);
